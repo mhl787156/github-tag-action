@@ -105,6 +105,7 @@ esac
 
 if $pre_release
 then
+    echo "Prerelease with $pre_tag about to be bumped (new: $new)"
     # Already a prerelease available, bump it
     if [[ "$pre_tag" == *"$new"* ]]; then
         new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
@@ -112,6 +113,7 @@ then
     	new=$(semver -i prerelease $pre_tag); part="pre-$part"
 #         new="$new-$suffix.1"; part="pre-$part"
     fi
+    echo "Prerelease bumped up to $pre_tag"
 fi
 
 echo $part
