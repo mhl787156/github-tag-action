@@ -42,6 +42,7 @@ for b in "${branch[@]}"; do
     fi
 done
 echo "pre_release = $pre_release"
+echo ::set-output name=is_pre_release::$pre_release
 
 # fetch tags
 git fetch --tags
