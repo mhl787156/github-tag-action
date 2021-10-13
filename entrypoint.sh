@@ -105,15 +105,12 @@ esac
 
 if $pre_release
 then
-    echo "Prerelease with $pre_tag about to be bumped (new: $new)"
     # Already a prerelease available, bump it
     if [[ "$pre_tag" == *"$new"* ]]; then
         new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
     else
     	new=$(semver -i prerelease $pre_tag); part="pre-$part"
-#         new="$new-$suffix.1"; part="pre-$part"
     fi
-    echo "Prerelease bumped up to $pre_tag"
 fi
 
 echo $part
@@ -135,7 +132,7 @@ fi
 
 if $pre_release
 then
-    echo -e "Bumping tag ${pre_tag}. \n\tNew tag ${new}"
+    echo -e "Bumping pre-release tag from ${pre_tag}. \n\tNew tag ${new}"
 else
     echo -e "Bumping tag ${tag}. \n\tNew tag ${new}"
 fi
@@ -143,6 +140,7 @@ fi
 # set outputs
 echo ::set-output name=new_tag::$new
 echo ::set-output name=part::$part
+echo ::set-output name=is_pre_release::$pre_release
 
 # use dry run to determine the next tag
 if $dryrun
