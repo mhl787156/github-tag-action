@@ -7,6 +7,7 @@ default_semvar_bump=${DEFAULT_BUMP:-minor}
 default_semvar_prerelease_bump=${DEFAULT_PRERELEASE_BUMP:-none}
 with_v=${WITH_V:-false}
 release_branches=${RELEASE_BRANCHES:-master,main}
+prerelease_branches=${PRERELEASE_BRANCES:-dev}
 custom_tag=${CUSTOM_TAG}
 source=${SOURCE:-.}
 dryrun=${DRY_RUN:-false}
@@ -22,6 +23,7 @@ echo -e "\tDEFAULT_BUMP: ${default_semvar_bump}"
 echo -e "\tDEFAULT_PRERELEASE_BUMP: ${default_semvar_prerelease_bump}"
 echo -e "\tWITH_V: ${with_v}"
 echo -e "\tRELEASE_BRANCHES: ${release_branches}"
+echo -e "\tPRERELEASE_BRANCHES: ${prerelease_branches}"
 echo -e "\tCUSTOM_TAG: ${custom_tag}"
 echo -e "\tSOURCE: ${source}"
 echo -e "\tDRY_RUN: ${dryrun}"
@@ -99,30 +101,27 @@ case "$log" in
         echo "Default bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0;;
     * ) 
     	if $pre_release
-	then
-		if [ "$default_semvar_prerelease_bump" == "none" ]; then
-		    echo "Default prerelease bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; 
-		else 
-		    new=$(semver -i "${default_semvar_prerelease_bump}" $tag); part=$default_semvar_prerelease_bump 
-		fi
-	else
-		if [ "$default_semvar_bump" == "none" ]; then
-		    echo "Default bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0 
-		else 
-		    new=$(semver -i "${default_semvar_bump}" $tag); part=$default_semvar_bump 
-		fi
-	fi
+        then
+            echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0; 
+        else
+            if [ "$default_semvar_bump" == "none" ]; then
+                echo "Default bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0 
+            else 
+                new=$(semver -i "${default_semvar_bump}" $tag); part=$default_semvar_bump 
+            fi
+        fi
         ;;
 esac
 
 if $pre_release
 then
     # Already a prerelease available, bump it
-    if [[ "$pre_tag" == *"$new"* ]]; then
-        new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
-    else
-    	new=$(semver -i prerelease $pre_tag); part="pre-$part"
-    fi
+    # if [[ "$pre_tag" == *"$new"* ]]; then
+    #     new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
+    # else
+    # 	new=$(semver -i prerelease $pre_tag); part="pre-$part"
+    # fi
+    part="pre-$part"
 fi
 
 echo $part
