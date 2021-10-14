@@ -154,7 +154,7 @@ echo ::set-output name=part::$part
 echo ::set-output name=is_pre_release::$pre_release
 
 # use dry run to determine the next tag
-if $dryrun
+if $dryrun || $is_pre_release 
 then
     echo ::set-output name=tag::$tag
     exit 0
