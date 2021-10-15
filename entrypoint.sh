@@ -34,6 +34,7 @@ echo -e "\tVERBOSE: ${verbose}"
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
+release="true"
 pre_release="true"
 IFS=',' read -ra branch <<< "$release_branches"
 for b in "${branch[@]}"; do
@@ -41,6 +42,7 @@ for b in "${branch[@]}"; do
     if [[ "${current_branch}" =~ $b ]]
     then
         pre_release="false"
+        release="true"
     fi
 done
 echo "pre_release = $pre_release"
@@ -102,7 +104,11 @@ case "$log" in
     * ) 
     	if $pre_release
         then
-            echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0; 
+            if [ "$default_semvar_prerelease_bump" == "none" ]; then
+                echo "Default prerelease bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; 
+            else 
+                new=$(semver -i "${default_semvar_prerelease_bump}" $tag); part=$default_semvar_prerelease_bump 
+            fi
         else
             if [ "$default_semvar_bump" == "none" ]; then
                 echo "Default bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0 
@@ -116,12 +122,11 @@ esac
 if $pre_release
 then
     # Already a prerelease available, bump it
-    # if [[ "$pre_tag" == *"$new"* ]]; then
-    #     new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
-    # else
-    # 	new=$(semver -i prerelease $pre_tag); part="pre-$part"
-    # fi
-    part="pre-$part"
+    if [[ "$pre_tag" == *"$new"* ]]; then
+        new=$(semver -i prerelease $pre_tag --preid $suffix); part="pre-$part"
+    else
+    	new=$(semver -i prerelease $pre_tag); part="pre-$part"
+    fi
 fi
 
 echo $part
@@ -151,7 +156,7 @@ fi
 # set outputs
 echo ::set-output name=new_tag::$new
 echo ::set-output name=part::$part
-echo ::set-output name=is_pre_release::$pre_release
+echo ::set-output name=is_release::$release
 
 # use dry run to determine the next tag
 if $dryrun || $is_pre_release 
