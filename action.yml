@@ -11,6 +11,10 @@ outputs:
     description: 'The latest tag after running this action'
   part:
     description: 'The part of version which was bumped'
+  is_pre_release:
+    description: 'If this tag is a pre-release'
+  is_release:
+    description: 'If this tag is a release'
 branding:
   icon: 'git-merge'  
   color: 'purple'
