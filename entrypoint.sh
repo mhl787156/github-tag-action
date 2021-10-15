@@ -48,6 +48,7 @@ done
 echo "pre_release = $pre_release"
 echo "release = $release"
 echo ::set-output name=is_pre_release::$pre_release
+echo ::set-output name=is_release::$release
 
 # fetch tags
 git fetch --tags
